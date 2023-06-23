@@ -1,4 +1,4 @@
-import moment from 'moment';
+import moment from 'moment-timezone';
 import { generateTimeSlots } from '../utils/generateTimeslots';
 import { isConflictPeriod } from '../utils/isConflictPeriod';
 import { DayTimetable } from '../types/getTimeSlot.type';
@@ -25,7 +25,7 @@ class TimeslotsService {
             let open_interval = 0;
             let close_interval = 24 * 60 * 60 + service_duration;
 
-            const startMoment = moment(start_day_identifier).add(day, 'days');
+            const startMoment = moment.tz(start_day_identifier, timezone_identifier).add(day, 'days');
             const yoil = startMoment.day() + 1;
             
             const workhour = await this.workhourRepository.findWorkhoursByWeekday(yoil);
