@@ -1,4 +1,4 @@
-import moment, { Moment } from 'moment';
+import moment, { Moment } from 'moment-timezone';
 
 export function generateTimeSlots(start: Moment, finish: Moment, interval: number, duration: number) {
     const current = start;
