@@ -87,7 +87,7 @@ export const events = [
         created_at: 1620272253,
         updated_at: 1620272253,
     },
-    // {  
+    // {
     //     begin_at: 1631242800, // Moment<2021-09-10T12:00:00+09:00>
     //     end_at: 1631253600, // Moment<2021-09-10T15:00:00+09:00>
     //     created_at: 1620272253,

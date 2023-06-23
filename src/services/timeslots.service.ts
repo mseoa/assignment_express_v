@@ -18,18 +18,19 @@ class TimeslotsService {
         is_ignore_schedule: boolean, //  해당 기간에 이미 존재하는 Event을 무시합니다.
         is_ignore_workhour: boolean // 해당 기간에 사롱에 설정되어 있는 is_day_off, open_interval, close_interval을 무시하고 하루 전체를 기간으로 설정
     ) => {
-        
         const result: DayTimetable[] = [];
 
         for (let day = 0; day < days; day++) {
             let open_interval = 0;
             let close_interval = 24 * 60 * 60 + service_duration;
 
-            const startMoment = moment.tz(start_day_identifier, timezone_identifier).add(day, 'days');
+            const startMoment = moment
+                .tz(start_day_identifier, timezone_identifier)
+                .add(day, 'days');
             const yoil = startMoment.day() + 1;
-            
+
             const workhour = await this.workhourRepository.findWorkhoursByWeekday(yoil);
-            
+
             if (!is_ignore_workhour && workhour) {
                 open_interval = workhour.open_interval;
                 close_interval = workhour.close_interval;
@@ -45,7 +46,6 @@ class TimeslotsService {
                 service_duration
             );
 
-
             if (!is_ignore_schedule) {
                 const events = await this.eventRepository.findEventsOnTheDay(
                     startMoment.clone().add(open_interval, 'seconds').unix(),
@@ -59,17 +59,18 @@ class TimeslotsService {
                 // console.log(events)
 
                 if (events.length > 0) {
-                    let newTimeSlots= []
+                    let newTimeSlots = [];
                     for (let i = 0; i < timeSlots.length; i++) {
                         let isConflicted = false;
                         for (let j = 0; j < events.length; j++) {
-                            
-                            if (isConflictPeriod(
-                                timeSlots[i].start,
-                                timeSlots[i].end,
-                                moment(events[j].begin_at*1000),
-                                moment(events[j].end_at*1000)
-                            )){
+                            if (
+                                isConflictPeriod(
+                                    timeSlots[i].start,
+                                    timeSlots[i].end,
+                                    moment(events[j].begin_at * 1000),
+                                    moment(events[j].end_at * 1000)
+                                )
+                            ) {
                                 isConflicted = true; // 충돌이 있을 경우 isConflicted true
                                 break;
                             }
@@ -77,9 +78,9 @@ class TimeslotsService {
 
                         if (!isConflicted) {
                             newTimeSlots.push(timeSlots[i]); // 충돌이 없을 경우에만 newTimeSlots에 추가
-                          }
+                        }
                     }
-                    timeSlots=newTimeSlots
+                    timeSlots = newTimeSlots;
                 }
                 // console.log('ttttttttt',timeSlots)
             }
@@ -99,7 +100,5 @@ class TimeslotsService {
         return result;
     };
 }
-
-
 
 export default TimeslotsService;

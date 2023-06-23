@@ -1,13 +1,18 @@
 import moment, { Moment } from 'moment-timezone';
 
-export function generateTimeSlots(start: Moment, finish: Moment, interval: number, duration: number) {
+export function generateTimeSlots(
+    start: Moment,
+    finish: Moment,
+    interval: number,
+    duration: number
+) {
     const current = start;
-    const timeslots: { start: Moment, end: Moment }[] = [];
+    const timeslots: { start: Moment; end: Moment }[] = [];
     while (current.clone().add(duration, 'seconds') <= finish) {
         timeslots.push({
             start: current.clone(),
             end: current.clone().add(duration, 'seconds'),
-        })
+        });
         current.add(interval, 'seconds');
     }
     return timeslots;
