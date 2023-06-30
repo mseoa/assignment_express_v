@@ -1,6 +1,8 @@
 import { Request, Response, NextFunction } from 'express';
 import TimeslotsService from '../services/timeslots.service';
 import { GetTimeSlotRequestBody } from '../types/getTimeSlot.type';
+import { getTimeSlotRequestSchema } from '../schemas/getTimeSlotReqSchema';
+
 
 class TimeslotsController {
     timeslotsService = new TimeslotsService();
@@ -16,6 +18,11 @@ class TimeslotsController {
                 is_ignore_schedule = false,
                 is_ignore_workhour = false,
             } = req.body as GetTimeSlotRequestBody;
+
+            const validate = getTimeSlotRequestSchema.validate(req.body);
+            if (validate.error) {
+                throw new Error(validate.error.message);
+            }
 
             let result = await this.timeslotsService.getDayTimeTable(
                 start_day_identifier,

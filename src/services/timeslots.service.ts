@@ -6,8 +6,10 @@ import EventsRepository from '../repositories/events.repository';
 import WorkhourRepository from '../repositories/workhour.repository';
 
 class TimeslotsService {
-    workhourRepository = new WorkhourRepository();
-    eventRepository = new EventsRepository();
+    constructor(
+        private workhourRepository = new WorkhourRepository(),
+        private eventRepository = new EventsRepository()
+    ) {}
 
     getDayTimeTable = async (
         start_day_identifier: string,
@@ -30,6 +32,16 @@ class TimeslotsService {
             const yoil = startMoment.day() + 1;
 
             const workhour = await this.workhourRepository.findWorkhoursByWeekday(yoil);
+
+            if (!is_ignore_workhour && workhour && workhour.is_day_off) {
+                result.push({
+                    start_of_day: startMoment.unix(),
+                    day_modifier: day,
+                    is_day_off: true,
+                    timeslots: [],
+                });
+                continue;
+            }
 
             if (!is_ignore_workhour && workhour) {
                 open_interval = workhour.open_interval;
@@ -56,8 +68,6 @@ class TimeslotsService {
                         .unix()
                 );
 
-                // console.log(events)
-
                 if (events.length > 0) {
                     let newTimeSlots = [];
                     for (let i = 0; i < timeSlots.length; i++) {
@@ -82,14 +92,12 @@ class TimeslotsService {
                     }
                     timeSlots = newTimeSlots;
                 }
-                // console.log('ttttttttt',timeSlots)
             }
 
             result.push({
                 start_of_day: startMoment.unix(),
                 day_modifier: day,
                 is_day_off: false,
-                // timeSlots: timeSlots.length,
                 timeslots: timeSlots.map((ts) => ({
                     begin_at: ts.start.unix(),
                     end_at: ts.end.unix(),
